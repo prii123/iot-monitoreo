@@ -10,7 +10,11 @@ export class DevicesService {
   constructor(@InjectModel(Device.name) private deviceModel: Model<Device>) {}
 
   async create(dto: CreateDeviceDto): Promise<Device> {
-    return this.deviceModel.create(dto);
+    const data = {
+      ...dto,
+      companyId: new Types.ObjectId(dto.companyId), // <-- conversión aquí
+    };
+    return this.deviceModel.create(data);
   }
 
   async findAll(companyId?: string): Promise<Device[]> {
@@ -34,4 +38,22 @@ export class DevicesService {
     const result = await this.deviceModel.findByIdAndDelete(id).exec();
     if (!result) throw new NotFoundException('Device not found');
   }
+
+  async findInactiveDevices(): Promise<Device[]> {
+    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+
+    return this.deviceModel.find({
+      lastSeen: { $lt: tenMinutesAgo },
+    }).exec();
+  }
+
+
+  async findAllByCompany(companyId: string) {
+    const data = await this.deviceModel.find({ companyId: new Types.ObjectId(companyId) }).exec();
+    // console.log(data)
+    return data; 
+  }
+  
+
+  
 }

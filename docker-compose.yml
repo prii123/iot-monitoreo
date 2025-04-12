@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./iot
+      dockerfile: Dockerfile
+    container_name: iot-backend
+    ports:
+      - "3000:3000"
+    networks:
+      - iot-network
+
+  frontend:
+    build:
+      context: ./iot-client
+      dockerfile: Dockerfile
+    container_name: iot-frontend
+    ports:
+      - "3001:3000"  # Next.js sirve en 3000, lo exponemos como 3001
+    depends_on:
+      - backend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://iot-backend:3000
+    networks:
+      - iot-network
+
+networks:
+  iot-network:
+    driver: bridge
