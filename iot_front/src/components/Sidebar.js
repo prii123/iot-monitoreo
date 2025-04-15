@@ -21,8 +21,8 @@ const Sidebar = () => {
         <nav className="bg-[#073c64] text-white w-64 h-full fixed top-0 left-0 z-50 overflow-y-auto shadow-md">
             {/* Header */}
             <div className="p-4 border-b border-blue-900">
-                <h1 className="text-xl font-bold">portainer.io</h1>
-                <p className="text-xs text-gray-300 ml-1">COMMUNITY EDITION</p>
+                <h1 className="text-xl font-bold">IOT</h1>
+                <p className="text-xs text-gray-300 ml-1">MONITOREO</p>
             </div>
 
 
@@ -32,14 +32,14 @@ const Sidebar = () => {
 
                 {/* Local Section Styled Like Image */}
                 <div className="bg-[#084c7c] rounded-md p-2 mb-4">
-                    <NavItem label="Dashboard" href="/" />
+                    {/* <NavItem label="Dashboard" href="/" /> */}
                     <Collapsible
-                        label="Templates"
+                        label="Acciones"
                         isOpen={open.templates}
                         onToggle={() => toggle("templates")}
                         links={[
-                            { label: "Nginx Template", href: "/" },
-                            { label: "NodeJS Template", href: "/" },
+                            { label: "___ Crear dispositivo", href: "/devices/crear" },
+                            { label: "___ Crear empresa", href: "/companies/crear" },
                         ]}
                     />
                     <NavItem label="Dispositivos" href="/devices" />

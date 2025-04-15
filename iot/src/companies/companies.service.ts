@@ -14,7 +14,9 @@ export class CompaniesService {
   }
 
   async findAll(): Promise<Company[]> {
-    return this.companyModel.find().exec();
+    const data = await this.companyModel.find().exec();
+    // console.log(data)
+    return data;
   }
 
   async findOne(id: string): Promise<Company> {

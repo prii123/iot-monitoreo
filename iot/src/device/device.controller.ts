@@ -18,12 +18,18 @@ export class DevicesController {
 
   @Post()
   create(@Body() dto: CreateDeviceDto) {
+    // console.log(dto)
     return this.devicesService.create(dto);
   }
 
   @Get()
   findAll(@Query('companyId') companyId?: string) {
     return this.devicesService.findAll(companyId);
+  }
+
+  @Get("loc")
+  findAllLoc(){
+    return this.devicesService.findAllLoc();
   }
 
   @Get(':id')

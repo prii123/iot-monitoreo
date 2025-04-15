@@ -22,6 +22,10 @@ export class DevicesService {
     return this.deviceModel.find(filter).exec();
   }
 
+  async findAllLoc(): Promise<Device[]> {
+    return this.deviceModel.find().exec();
+  }
+
   async findOne(id: string): Promise<Device> {
     const device = await this.deviceModel.findById(id).exec();
     if (!device) throw new NotFoundException('Device not found');
