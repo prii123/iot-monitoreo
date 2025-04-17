@@ -10,13 +10,17 @@ export class CompaniesService {
   constructor(@InjectModel(Company.name) private companyModel: Model<Company>) {}
 
   async create(dto: CreateCompanyDto): Promise<Company> {
-    return this.companyModel.create(dto);
+    const data = {
+      ...dto,
+      status:true
+    }
+    return this.companyModel.create(data);
   }
 
   async findAll(): Promise<Company[]> {
-    const data = await this.companyModel.find().exec();
-    // console.log(data)
-    return data;
+    return this.companyModel.find({
+      status: true // Esto filtrará por status: true cuando onlyActive es true
+    }).exec();
   }
 
   async findOne(id: string): Promise<Company> {
@@ -30,6 +34,17 @@ export class CompaniesService {
     if (!company) throw new NotFoundException('Company not found');
     return company;
   }
+
+  async updateStatusToFalse(id: string): Promise<Company> {
+    const company = await this.companyModel.findByIdAndUpdate(
+      id, 
+      { status: false }, 
+      { new: true }
+    ).exec();
+    
+    if (!company) throw new NotFoundException('Company not found');
+    return company;
+}
 
   async remove(id: string): Promise<void> {
     const result = await this.companyModel.findByIdAndDelete(id).exec();

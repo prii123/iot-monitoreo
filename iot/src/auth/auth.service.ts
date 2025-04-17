@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { LoginAuthDto } from './dto/create-auth.dto';
+import { LoginAuthDto } from './dto/login-auth.dto';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { User } from 'src/user/entities/user.entity';
 import { compareHash, generateHash } from './util/handleBcrypt';

@@ -27,10 +27,10 @@ export class DevicesController {
     return this.devicesService.findAll(companyId);
   }
 
-  @Get("loc")
-  findAllLoc(){
-    return this.devicesService.findAllLoc();
-  }
+  // @Get("loc")
+  // findAllLoc(){
+  //   return this.devicesService.findAllLoc();
+  // }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -40,6 +40,11 @@ export class DevicesController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateDeviceDto) {
     return this.devicesService.update(id, dto);
+  }
+
+  @Patch('updateOffline/:id')
+  updateOffline(@Param('id') id: string) {
+    return this.devicesService.updateStatusToOffline(id);
   }
 
   @Delete(':id')

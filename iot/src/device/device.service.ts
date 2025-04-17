@@ -18,13 +18,19 @@ export class DevicesService {
   }
 
   async findAll(companyId?: string): Promise<Device[]> {
-    const filter = companyId ? { companyId: new Types.ObjectId(companyId) } : {};
+    const filter = companyId 
+      ? { 
+          companyId: new Types.ObjectId(companyId),
+          status: 'online'
+        } 
+      : { status: 'online' };
+      
     return this.deviceModel.find(filter).exec();
   }
 
-  async findAllLoc(): Promise<Device[]> {
-    return this.deviceModel.find().exec();
-  }
+  // async findAllLoc(): Promise<Device[]> {
+  //   return this.deviceModel.find().exec();
+  // }
 
   async findOne(id: string): Promise<Device> {
     const device = await this.deviceModel.findById(id).exec();
@@ -38,6 +44,17 @@ export class DevicesService {
     return device;
   }
 
+  async updateStatusToOffline(id: string): Promise<Device> {
+    const device = await this.deviceModel.findByIdAndUpdate(
+      id, 
+      { status: 'offline' }, 
+      { new: true }
+    ).exec();
+    
+    if (!device) throw new NotFoundException('Device not found');
+    return device;
+  }
+
   async remove(id: string): Promise<void> {
     const result = await this.deviceModel.findByIdAndDelete(id).exec();
     if (!result) throw new NotFoundException('Device not found');
@@ -45,9 +62,10 @@ export class DevicesService {
 
   async findInactiveDevices(): Promise<Device[]> {
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
-
+  
     return this.deviceModel.find({
-      lastSeen: { $lt: tenMinutesAgo },
+      status: 'online',  // Solo dispositivos marcados como online
+      lastSeen: { $lt: tenMinutesAgo }  // Pero que no han sido vistos en los últimos 10 minutos
     }).exec();
   }
 

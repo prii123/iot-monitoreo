@@ -28,6 +28,11 @@ export class CompaniesController {
     return this.companiesService.update(id, dto);
   }
 
+  @Patch('updateStatus/:id')
+  updateToStatus(@Param('id') id: string) {
+    return this.companiesService.updateStatusToFalse(id);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.companiesService.remove(id);

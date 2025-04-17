@@ -8,6 +8,10 @@ export class Company extends Document {
 
   @Prop()
   description?: string;
+
+  @Prop()
+  status: boolean;
+
 }
 
 export const CompanySchema = SchemaFactory.createForClass(Company);
