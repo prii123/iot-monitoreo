@@ -23,6 +23,9 @@ export class User extends Document {
   })
   role: ROLES;
 
+  @Prop()
+  refreshToken: string
+
   // Opción para relaciones (referencias)
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Company' }] })
   companies?: Types.ObjectId[];

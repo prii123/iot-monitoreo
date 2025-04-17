@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -117,34 +117,42 @@ export class AuthService {
       const payload = this.jwtService.verify(refreshToken, {
         secret: process.env.JWT_REFRESH_SECRET,
       });
-
-      // Buscar usuario en la base de datos
+  
+      // Buscar usuario y validar el refresh token
       const user = await this.userModel.findOne({
         _id: payload.sub,
-        refreshToken: refreshToken
+        refreshToken: refreshToken // Compara con el almacenado en BD
       }).exec();
-
+  
       if (!user) {
-        throw new ErrorManager({
-          type: 'UNAUTHORIZED',
-          message: 'Refresh token inválido',
-        });
+        throw new UnauthorizedException('Refresh token inválido');
       }
-
-      // Generar nuevo access token
-      const newPayload = { 
-        email: user.email, 
-        sub: user._id,
-        role: user.role 
-      };
-
-      const newAccessToken = this.jwtService.sign(newPayload);
-
+  
+      // Generar NUEVOS tokens (access + refresh)
+      const newAccessToken = this.jwtService.sign(
+        { email: user.email, sub: user._id, role: user.role },
+        { expiresIn: '15m' } // Access token corto
+      );
+  
+      const newRefreshToken = this.jwtService.sign(
+        { sub: user._id },
+        { 
+          secret: process.env.JWT_REFRESH_SECRET,
+          expiresIn: '7d' // Refresh token largo
+        }
+      );
+  
+      // Actualizar el refresh token en la base de datos
+      user.refreshToken = newRefreshToken;
+      await user.save();
+  
       return {
         access_token: newAccessToken,
+        refresh_token: newRefreshToken // Envía el nuevo refresh token
       };
+  
     } catch (error) {
-      throw ErrorManager.createSignatureError(error.message);
+      throw new UnauthorizedException('Token de refresco inválido');
     }
   }
 

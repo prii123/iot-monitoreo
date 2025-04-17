@@ -1,4 +1,3 @@
-// src/lib/api/interceptor.js
 import { refreshToken } from './auth';
 import Cookies from 'js-cookie';
 
@@ -13,36 +12,41 @@ const processQueue = (error, token = null) => {
       prom.resolve(token);
     }
   });
-
   failedQueue = [];
 };
 
 export const authFetch = async (url, options = {}) => {
-  // Verifica si estamos en el cliente (Cookies solo existen en el cliente)
+  // Verifica si estamos en el cliente
   if (typeof window === 'undefined') {
     throw new Error('authFetch can only be used on the client side');
   }
 
+  // Configuración inicial de headers
+  const headers = {
+    'Content-Type': 'application/json',
+    ...options.headers,
+  };
+
+  // Obtiene tokens (si existen)
   const accessToken = Cookies.get('access_token');
   const refreshTokenValue = Cookies.get('refresh_token');
 
-  // Configuración inicial de la solicitud
-  options.headers = {
-    ...options.headers,
-    'Content-Type': 'application/json',
-    ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {}),
-  };
+  // Agrega el token de acceso si existe
+  if (accessToken) {
+    headers['Authorization'] = `Bearer ${accessToken}`;
+  }
 
-  let response = await fetch(url, options);
+  // Primera llamada a la API
+  let response = await fetch(url, { ...options, headers });
 
-  // Si el token expiró (401) y tenemos refreshToken, intentamos refrescar
+  // Manejo de token expirado (401)
   if (response.status === 401 && refreshTokenValue && !options._retry) {
     if (isRefreshing) {
       return new Promise((resolve, reject) => {
         failedQueue.push({ resolve, reject });
       }).then(token => {
-        options.headers['Authorization'] = `Bearer ${token}`;
-        return fetch(url, options);
+        headers['Authorization'] = `Bearer ${token}`;
+        return fetch(url, { ...options, headers });
       }).catch(err => {
         return Promise.reject(err);
       });
@@ -52,29 +56,49 @@ export const authFetch = async (url, options = {}) => {
     options._retry = true;
 
     try {
-      const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await refreshToken(refreshTokenValue);
-      
-      // Actualizamos los tokens en las cookies
-      Cookies.set('access_token', newAccessToken, { expires: 1 }); // Expira en 1 día
-      Cookies.set('refresh_token', newRefreshToken, { expires: 1 });
-      
-      // Actualizamos el header de autorización
-      options.headers['Authorization'] = `Bearer ${newAccessToken}`;
-      
-      // Procesamos la cola de solicitudes fallidas
+      // Intenta renovar el token
+      const { access_token: newAccessToken, refresh_token: newRefreshToken } = await refreshToken(refreshTokenValue);
+
+      // Actualiza cookies (configuración segura recomendada)
+      Cookies.set('access_token', newAccessToken, {
+        expires: 1, // 1 día
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict'
+      });
+
+      Cookies.set('refresh_token', newRefreshToken, {
+        expires: 7, // 7 días
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict'
+      });
+
+      // Actualiza el header y reprocesa la cola
+      headers['Authorization'] = `Bearer ${newAccessToken}`;
       processQueue(null, newAccessToken);
-      
-      // Reintentamos la solicitud original
-      response = await fetch(url, options);
+
+      // Reintenta la solicitud original
+      response = await fetch(url, { ...options, headers });
+
     } catch (error) {
-      // Si falla el refresh, limpiamos las cookies
+      // Limpia cookies y redirige si el refresh falla
       Cookies.remove('access_token');
       Cookies.remove('refresh_token');
       processQueue(error, null);
-      throw error;
+      
+      // Redirige a login (opcional)
+      if (typeof window !== 'undefined') {
+        window.location.href = '/auth/login';
+      }
+      
+      throw new Error('Session expired. Please login again.');
     } finally {
       isRefreshing = false;
     }
+  }
+
+  // Si sigue siendo un 401 después del refresh, lanza error
+  if (response.status === 401) {
+    throw new Error('Unauthorized');
   }
 
   return response;

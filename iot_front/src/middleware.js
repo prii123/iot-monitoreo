@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 
 export function middleware(request) {
-  const token = request.cookies.get('access_token');
+  const accessToken = request.cookies.get('access_token')?.value;
+  const refreshToken = request.cookies.get('refresh_token')?.value;
   const { pathname } = request.nextUrl;
 
   // Rutas protegidas
@@ -12,13 +13,19 @@ export function middleware(request) {
 
   // Verificar rutas protegidas
   if (protectedRoutes.some(route => pathname.startsWith(route))) {
-    if (!token) {
+    if (!accessToken) {
+      // Si no hay accessToken pero hay refreshToken, intentar renovar
+      if (refreshToken) {
+        const response = NextResponse.redirect(new URL('/api/auth/refresh', request.url));
+        return response;
+      }
+      // Si no hay ningún token, redirigir a login
       return NextResponse.redirect(new URL('/auth/login', request.url));
     }
   }
 
   // Si ya está autenticado, redirigir del login/register al dashboard
-  if (authRoutes.includes(pathname) && token) {
+  if (authRoutes.includes(pathname) && accessToken) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 

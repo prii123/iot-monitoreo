@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import DashboardLayout from './layoutSidebar';
 
 export default function HomePage() {
   return (
