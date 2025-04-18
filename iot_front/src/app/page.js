@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/authContext'; // ajustá este path según dónde tengas tu contexto
+import DashboardLayout from './layoutSidebar';
 
 export default function HomePage() {
   const { user, loading } = useAuth();
