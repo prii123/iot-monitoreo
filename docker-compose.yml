@@ -21,7 +21,8 @@ services:
     depends_on:
       - backend
     environment:
-      - NEXT_PUBLIC_API_URL=http://iot-backend:4000/api
+      - NEXT_PUBLIC_API_URL=http://143.110.238.208:4000/api
+
     networks:
       - iot-network
 
