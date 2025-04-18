@@ -12,6 +12,7 @@ export class DevicesService {
   async create(dto: CreateDeviceDto): Promise<Device> {
     const data = {
       ...dto,
+      status: 'online',
       companyId: new Types.ObjectId(dto.companyId), // <-- conversión aquí
     };
     return this.deviceModel.create(data);

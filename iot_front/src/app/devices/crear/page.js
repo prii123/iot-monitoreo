@@ -18,7 +18,6 @@ export default function CreateDeviceForm() {
         name: "",
         type: "",
         location: { lat: "", lng: "" },
-        status: "offline",
         config: {},
         metadata: {},
     });
