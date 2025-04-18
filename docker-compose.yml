@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: iot-backend
     ports:
-      - "3000:3000"
+      - "4000:3000"
     networks:
       - iot-network
 
@@ -17,11 +17,11 @@ services:
       dockerfile: Dockerfile
     container_name: iot-frontend
     ports:
-      - "3001:3000"  # Next.js sirve en 3000, lo exponemos como 3001
+      - "4001:3000"  # Next.js sirve en 3000, lo exponemos como 3001
     depends_on:
       - backend
     environment:
-      - NEXT_PUBLIC_API_URL=http://iot-backend:3000
+      - NEXT_PUBLIC_API_URL=http://iot-backend:4000
     networks:
       - iot-network
 
