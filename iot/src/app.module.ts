@@ -9,7 +9,7 @@ import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017/iotdb'), //mongodb://localhost:27017
+    MongooseModule.forRoot('mongodb+srv://printsvallejos:A6dJ7ZcgiMVLKA5a@cluster0.o7pkfah.mongodb.net/?retryWrites=true&w=majority'), //mongodb://localhost:27017/iotdb  &appName=Cluster0
     CompaniesModule,
     DeviceModule,
     UserModule,
