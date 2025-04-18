@@ -44,8 +44,8 @@ export function AuthProvider({ children }) {
       
       setAccessToken(data.access_token);
       setUser(data.user);
-      console.log("fetch")
-      console.log(data)
+      // console.log("fetch")
+      // console.log(data)
       return data;
     } catch (error) {
       throw error;
