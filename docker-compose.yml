@@ -17,7 +17,7 @@ services:
       dockerfile: Dockerfile
     container_name: iot-frontend
     ports:
-      - "4001:4001"  # Next.js sirve en 3000, lo exponemos como 3001
+      - "4001:4001" 
     depends_on:
       - backend
     environment:
