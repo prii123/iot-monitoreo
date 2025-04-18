@@ -1,6 +1,7 @@
 
 
 import React, { useState } from 'react';
+import { authFetch } from '@/lib/api/interceptor';
 
 export default function CompanyList({ companies, apiBaseUrl, refreshData }) {
   const [devicesByCompany, setDevicesByCompany] = useState({});
@@ -14,7 +15,7 @@ export default function CompanyList({ companies, apiBaseUrl, refreshData }) {
     } else {
       try {
         setActiveCompanyId(companyId);
-        const res = await fetch(`${apiBaseUrl}/devices/company/${companyId}`);
+        const res = await authFetch(`${apiBaseUrl}/devices/company/${companyId}`);
         const data = await res.json();
         setDevicesByCompany((prev) => ({ ...prev, [companyId]: data }));
       } catch (error) {
