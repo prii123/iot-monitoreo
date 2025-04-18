@@ -6,7 +6,7 @@ export function middleware(request) {
   const { pathname } = request.nextUrl;
 
   // Rutas protegidas
-  const protectedRoutes = [ '/','/dashboard', '/companies', '/devices'];
+  const protectedRoutes = ['/dashboard', '/companies', '/devices'];
   
   // Rutas de autenticación
   const authRoutes = ['/auth/login', '/auth/register'];
